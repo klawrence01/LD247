@@ -1,186 +1,332 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-// NOTE TO FUTURE KEN/MILES:
-// You'll replace the mock `contactsData` with the real data you get from Supabase.
-// That data should include both:
-//   - manual contacts (source = 'manual')
-//   - followers collected from site (source = 'follow')
+type Contact = {
+  id: string;
+  name: string | null;
+  email: string;
+  source: string | null;
+  created_at: string;
+};
 
-export default function ContactsPage() {
-  // Mock data structure we want long-term:
-  const [contactsData, setContactsData] = useState([
-    // Example follower that came in automatically from the public page
-    {
-      id: "1",
-      name: "Tasha (Hair Client)",
-      email: "tasha@example.com",
-      source: "follow", // auto follower
-      created_at: "2025-10-28T14:30:00Z",
-    },
-    // Example manual add
-    {
-      id: "2",
-      name: "Jay from Friday promo",
-      email: "jay@gmail.com",
-      source: "manual", // manually added from the shop
-      created_at: "2025-10-27T18:00:00Z",
-    },
-  ]);
+type Message = {
+  id: string;
+  subject: string | null;
+  body: string;
+  created_at: string;
+  contact_id: string | null;
+};
 
-  // controlled inputs for Add Contact form
-  const [nameInput, setNameInput] = useState("");
-  const [emailInput, setEmailInput] = useState("");
+const MERCHANT_ID = "demo-merchant"; // TODO: swap for real merchant/user id
 
-  // This is where you'll call your Supabase insert:
-  // Insert new contact, source = 'manual'
-  async function handleAddContact(e: React.FormEvent) {
-    e.preventDefault();
+export default function MerchantMessagingContactsPage() {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loadingContacts, setLoadingContacts] = useState(true);
 
-    if (!emailInput.trim()) {
-      alert("Email is required.");
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+
+  const [sendTo, setSendTo] = useState<"all" | string>("all");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState(
+    "Hi! Thanks for following us on Local Deals 24/7. This week we’re running..."
+  );
+  const [statusMsg, setStatusMsg] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const [recentMessages, setRecentMessages] = useState<Message[]>([]);
+
+  const [search, setSearch] = useState("");
+
+  // load contacts + messages
+  useEffect(() => {
+    async function loadContacts() {
+      setLoadingContacts(true);
+      const { data } = await supabase
+        .from("merchant_contacts")
+        .select("id, name, email, source, created_at")
+        .eq("merchant_id", MERCHANT_ID)
+        .order("created_at", { ascending: false });
+      if (data) setContacts(data as Contact[]);
+      setLoadingContacts(false);
+    }
+
+    async function loadMessages() {
+      const { data } = await supabase
+        .from("merchant_messages")
+        .select("id, subject, body, contact_id, created_at")
+        .eq("merchant_id", MERCHANT_ID)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (data) setRecentMessages(data as Message[]);
+    }
+
+    loadContacts();
+    loadMessages();
+  }, []);
+
+  const filteredContacts = contacts.filter((c) => {
+    const term = search.toLowerCase();
+    return (
+      c.email.toLowerCase().includes(term) ||
+      (c.name || "").toLowerCase().includes(term)
+    );
+  });
+
+  async function addContact() {
+    if (!newEmail.trim()) return;
+
+    const { data, error } = await supabase
+      .from("merchant_contacts")
+      .insert({
+        merchant_id: MERCHANT_ID,
+        name: newName.trim() || null,
+        email: newEmail.trim(),
+        source: "added",
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      setContacts((prev) => [data as Contact, ...prev]);
+      setNewName("");
+      setNewEmail("");
+      setStatusMsg("Contact added.");
+    }
+  }
+
+  async function sendMessage() {
+    if (!body.trim()) {
+      setStatusMsg("Please enter a message.");
       return;
     }
 
-    const newContact = {
-      id: crypto.randomUUID(),
-      name: nameInput.trim() || "",
-      email: emailInput.trim(),
-      source: "manual",
-      created_at: new Date().toISOString(),
+    setSending(true);
+    setStatusMsg("");
+
+    const payload = {
+      merchant_id: MERCHANT_ID,
+      contact_id: sendTo === "all" ? null : sendTo,
+      subject: subject.trim() || null,
+      body: body.trim(),
     };
 
-    // TODO: replace this with Supabase insert:
-    // const { error } = await supabase
-    //   .from("contacts")
-    //   .insert([{ business_id, name, email, source: "manual" }])
-    // if (error) { ... }
+    const { error } = await supabase.from("merchant_messages").insert(payload);
 
-    setContactsData((prev) => [newContact, ...prev]);
-    setNameInput("");
-    setEmailInput("");
+    if (error) {
+      setStatusMsg("Could not send message (saved locally).");
+    } else {
+      setStatusMsg(
+        sendTo === "all"
+          ? `Message saved – send to ${contacts.length} contacts.`
+          : "Message saved for that contact."
+      );
+      // refresh recent messages
+      const { data } = await supabase
+        .from("merchant_messages")
+        .select("id, subject, body, contact_id, created_at")
+        .eq("merchant_id", MERCHANT_ID)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (data) setRecentMessages(data as Message[]);
+    }
+
+    setSending(false);
   }
 
   return (
-    <main className="p-6 text-gray-900">
-      {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold mb-2">Contacts</h1>
-        <p className="text-sm text-gray-700 leading-relaxed max-w-2xl">
+    <main className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="px-6 py-6 border-b border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900">Messaging Contacts</h1>
+        <p className="text-sm text-gray-500 mt-1">
           These are your people — followers and customers who said they want to
-          hear from you.
-          <br />
-          When someone follows you on Local Deals 24/7, they show up here. You
-          can also add people manually (walk-ins, regulars, VIPs).
+          hear from you. Send to one or everyone.
         </p>
       </div>
 
-      {/* Add contact form */}
-      <form
-        onSubmit={handleAddContact}
-        className="bg-white border border-gray-300 rounded-xl shadow-sm p-4 mb-8 max-w-xl"
-      >
-        <div className="flex flex-col gap-3 md:flex-row md:items-start">
-          <input
-            type="text"
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            placeholder="Name (optional)"
-            className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500"
-          />
+      <div className="max-w-5xl mx-auto px-6 py-6 flex flex-col gap-6">
+        {/* Compose */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-sm font-semibold mb-3">
+            Create a Note / Announcement
+          </h2>
 
-          <input
-            type="email"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            placeholder="Email *"
-            className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500"
-            required
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Send to</label>
+              <select
+                value={sendTo}
+                onChange={(e) => setSendTo(e.target.value as any)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All contacts</option>
+                {filteredContacts.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name || c.email}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Type below to filter, or pick “All contacts”.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Subject (optional)
+              </label>
+              <input
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Weekend Special, New Hours…"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Message</label>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={4}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Hi! Thanks for following us on Local Deals 24/7. This week we’re running…"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Keep it short and friendly. Mention the deal or update. You can
+              copy/paste this into email or SMS.
+            </p>
+          </div>
+
+          <div className="flex gap-3 items-center">
+            <button
+              onClick={sendMessage}
+              disabled={sending}
+              className="bg-black text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-gray-900 disabled:opacity-50"
+            >
+              {sending ? "Sending…" : "Send Message"}
+            </button>
+            {statusMsg ? (
+              <p className="text-xs text-gray-500">{statusMsg}</p>
+            ) : null}
+          </div>
         </div>
 
-        <button
-          type="submit"
-          className="mt-4 w-full md:w-auto bg-black text-white font-semibold text-sm rounded-md px-4 py-2 hover:bg-gray-900"
-        >
-          Add Contact
-        </button>
-
-        <p className="text-[13px] text-gray-500 mt-3 leading-snug max-w-lg">
-          Tip: Ask “Want us to send you our specials?” and enter them here. This
-          is how you build repeat customers without buying ads.
-        </p>
-      </form>
-
-      {/* Contacts / Followers list */}
-      <section className="bg-white border border-gray-300 rounded-xl shadow-sm p-4">
-        <h2 className="text-lg font-bold text-black mb-3">Your List</h2>
-        <p className="text-sm text-gray-600 mb-4 max-w-xl leading-relaxed">
-          Everyone below has asked to hear from you. You can message them in the{" "}
-          <span className="font-medium text-gray-900">
-            Messaging Center
-          </span>{" "}
-          tab.
-        </p>
-
-        {contactsData.length === 0 ? (
-          <div className="text-sm text-gray-600 border border-dashed border-gray-300 rounded-lg p-4">
-            No contacts yet.
+        {/* Add Contact */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-sm font-semibold mb-3">Add Contact</h2>
+          <div className="flex flex-col md:flex-row gap-3">
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Name (optional)"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm flex-1"
+            />
+            <input
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              placeholder="Email *"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm flex-1"
+            />
+            <button
+              onClick={addContact}
+              className="bg-black text-white rounded-md px-4 py-2 text-sm font-semibold"
+            >
+              Add Contact
+            </button>
           </div>
-        ) : (
-          <ul className="divide-y divide-gray-200 border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm text-sm">
-            {contactsData.map((c) => (
-              <li
-                key={c.id}
-                className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
-              >
-                {/* Left side: name/email */}
-                <div>
-                  <div className="font-semibold text-black break-all">
-                    {c.name ? c.name : c.email}
-                  </div>
-                  <div className="text-gray-600 break-all">{c.email}</div>
+          <p className="text-xs text-gray-400 mt-2">
+            Tip: ask “Want us to send you our specials?” and enter them here.
+          </p>
+        </div>
 
-                  <div className="text-[13px] text-gray-500 mt-1 flex flex-wrap gap-2">
-                    <span className="px-2 py-[2px] rounded-full border border-gray-300 bg-gray-50 text-gray-700">
-                      {c.source === "follow" ? "Followed you" : "Added by you"}
-                    </span>
-                    <span>
-                      {new Date(c.created_at).toLocaleString(undefined, {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </span>
-                  </div>
-                </div>
+        {/* Your List */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-sm font-semibold">Your List</h2>
+              <p className="text-xs text-gray-500">
+                Everyone below has asked to hear from you.
+              </p>
+            </div>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name or email..."
+              className="border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+            />
+          </div>
 
-                {/* Right side: future actions */}
-                <div className="text-right md:text-left">
+          {loadingContacts ? (
+            <p className="text-xs text-gray-400">Loading contacts…</p>
+          ) : filteredContacts.length === 0 ? (
+            <p className="text-xs text-gray-400">
+              No contacts match that search.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredContacts.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between gap-3 border border-gray-100 rounded-xl px-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {c.name || c.email}
+                    </p>
+                    <p className="text-xs text-gray-500">{c.email}</p>
+                    <div className="flex gap-2 mt-1 items-center">
+                      {c.source ? (
+                        <span className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                          {c.source}
+                        </span>
+                      ) : null}
+                      <span className="text-[10px] text-gray-400">
+                        {new Date(c.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                   <button
-                    className="text-blue-600 font-medium hover:underline"
-                    // this would prefill a new message draft to that email
                     onClick={() => {
-                      // TODO: route to /dashboard/merchant/messaging/new?to={c.email}
-                      alert(
-                        `Would start a note to ${c.email} (wire this up next).`
-                      );
+                      setSendTo(c.id);
+                      setStatusMsg("");
                     }}
+                    className="text-sm text-blue-600 hover:underline"
                   >
                     Message →
                   </button>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              ))}
+            </div>
+          )}
+        </div>
 
-      {/* Footer helper */}
-      <footer className="text-[13px] text-gray-500 leading-snug border-t border-gray-200 pt-4 mt-10">
-        You don’t need to buy ads to keep people coming back. You just need a
-        list, and a steady voice.
-      </footer>
+        {/* Recent messages */}
+        {recentMessages.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-6">
+            <h2 className="text-sm font-semibold mb-3">Recent Messages</h2>
+            <div className="flex flex-col gap-3">
+              {recentMessages.map((m) => (
+                <div key={m.id} className="border border-gray-100 rounded-lg p-3">
+                  <p className="text-xs text-gray-400 mb-1">
+                    {new Date(m.created_at).toLocaleString()} •{" "}
+                    {m.contact_id ? "1 recipient" : "All contacts"}
+                  </p>
+                  {m.subject ? (
+                    <p className="text-sm font-semibold">{m.subject}</p>
+                  ) : null}
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                    {m.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

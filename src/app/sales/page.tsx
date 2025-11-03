@@ -1,197 +1,194 @@
-// src/app/sales/page.tsx
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "List My Business • Local Deals 24/7",
-  description:
-    "Get your own page, post daily deals, and reach local buyers with Local Deals 24/7.",
-};
+import React from "react";
 
-export default function SalesPage() {
+export default function SalesLeadPage() {
+  // mock metrics for now – later pull from DB
+  const stats = [
+    { label: "New Leads Today", value: 3 },
+    { label: "Appointments This Week", value: 5 },
+    { label: "Businesses Onboarded", value: 2 },
+  ];
+
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
-      {/* Header */}
-      <header className="text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight text-black">
-          Get Your Business Featured
-        </h1>
-        <p className="mt-4 text-base text-gray-700">
-          Local Deals 24/7 helps local businesses get attention — without
-          spending crazy ad money. You get your own public page, daily deal
-          slots, and real customer demand.
-        </p>
-
-        <div className="mt-6 inline-block rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white">
-          Everyday Deals. Everyday Heroes.
+    <main className="min-h-screen bg-white text-gray-900">
+      {/* Rep snapshot */}
+      <section className="max-w-5xl mx-auto pt-8 px-4 lg:px-0">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+            >
+              <p className="text-xs uppercase text-gray-500 mb-1">
+                {stat.label}
+              </p>
+              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            </div>
+          ))}
         </div>
-      </header>
+      </section>
 
-      {/* Interest Form */}
-      <section className="mt-10 rounded-2xl border p-6 shadow-sm bg-white">
-        <h2 className="text-lg font-semibold text-black">
-          Tell us about your business
-        </h2>
-        <p className="mt-1 text-sm text-gray-600">
-          This isn’t a contract. This just lets us reach out and get you set up.
-        </p>
+      {/* Top hero / founder voice */}
+      <section className="max-w-5xl mx-auto pt-2 px-4 lg:px-0">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-extrabold tracking-tight mb-3">
+            Get Your Business Featured
+          </h1>
+          <p className="text-gray-700 leading-relaxed mt-2 max-w-3xl mx-auto">
+            Local Deals 24/7 helps local businesses get attention — without
+            spending crazy ad money. You get your own public page, daily deal
+            slots, and real customer activity in your city.
+            <strong className="block text-orange-600 mt-2">
+              For a limited time, sign up now and unlock a <u>free trial</u> —
+              giving your business the power to be seen everywhere.
+            </strong>
+          </p>
+        </div>
 
-        <form
-          action="/api/lead"
-          method="POST"
-          className="mt-6 grid gap-5 text-sm"
-        >
-          {/* Business Name */}
-          <div className="grid gap-2">
-            <label
-              htmlFor="businessName"
-              className="font-medium text-gray-800"
-            >
-              Business Name *
-            </label>
-            <input
-              id="businessName"
-              name="businessName"
-              required
-              className="w-full rounded-lg border px-3 py-2 shadow-sm"
-              placeholder="Tony’s Pizza"
-            />
-          </div>
-
-          {/* Category */}
-          <div className="grid gap-2">
-            <label
-              htmlFor="category"
-              className="font-medium text-gray-800"
-            >
-              What kind of business are you? *
-            </label>
-            <select
-              id="category"
-              name="category"
-              required
-              className="w-full rounded-lg border px-3 py-2 shadow-sm"
-            >
-              <option value="">Select one…</option>
-              <option value="food">Food / Restaurant / Pizza / Café</option>
-              <option value="beauty">Nails / Barbers / Beauty / Spa</option>
-              <option value="health">Chiropractor / Wellness / Fitness</option>
-              <option value="retail">Retail / Shop / Boutique</option>
-              <option value="services">Local Service Business</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* City / State */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <label
-                htmlFor="city"
-                className="font-medium text-gray-800"
-              >
-                City *
-              </label>
-              <input
-                id="city"
-                name="city"
-                required
-                className="w-full rounded-lg border px-3 py-2 shadow-sm"
-                placeholder="New Haven"
-              />
+        {/* Video + founder note – stays light, top third */}
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-start mb-12">
+          {/* Video placeholder */}
+          <div className="w-full">
+            <div className="relative w-full overflow-hidden rounded-2xl bg-black aspect-video flex items-center justify-center text-white text-sm">
+              <span className="opacity-80">Your welcome video goes here</span>
             </div>
-
-            <div className="grid gap-2">
-              <label
-                htmlFor="state"
-                className="font-medium text-gray-800"
-              >
-                State *
-              </label>
-              <input
-                id="state"
-                name="state"
-                required
-                className="w-full rounded-lg border px-3 py-2 shadow-sm"
-                placeholder="CT"
-              />
-            </div>
-          </div>
-
-          {/* Contact */}
-          <div className="grid gap-2">
-            <label
-              htmlFor="contact"
-              className="font-medium text-gray-800"
-            >
-              Best way to reach you (phone or email) *
-            </label>
-            <input
-              id="contact"
-              name="contact"
-              required
-              className="w-full rounded-lg border px-3 py-2 shadow-sm"
-              placeholder="203-555-1234 or owner@tonyspizza.com"
-            />
-          </div>
-
-          {/* Promo Interest */}
-          <div className="grid gap-2">
-            <label
-              htmlFor="offer"
-              className="font-medium text-gray-800"
-            >
-              What kind of deal would you want to promote first?
-            </label>
-            <textarea
-              id="offer"
-              name="offer"
-              rows={3}
-              className="w-full rounded-lg border px-3 py-2 shadow-sm"
-              placeholder="2 slices + drink for $5 (normally $9)"
-            />
-            <p className="text-xs text-gray-500">
-              Example: “20% off first visit”, “Free brow wax with manicure”, “First class $10”
+            <p className="text-xs text-gray-400 mt-2">
+              Tip: record a 45–60 second personal welcome so they know it’s you.
             </p>
           </div>
 
-          {/* How did you hear about us */}
-          <div className="grid gap-2">
-            <label
-              htmlFor="source"
-              className="font-medium text-gray-800"
-            >
-              How did you hear about Local Deals 24/7?
-            </label>
-            <input
-              id="source"
-              name="source"
-              className="w-full rounded-lg border px-3 py-2 shadow-sm"
-              placeholder="Friend, Instagram, you visited my shop, etc."
-            />
+          {/* Kenneth voice */}
+          <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              <strong>Hi, I’m Kenneth Lawrence.</strong> I built Local Deals
+              24/7 because I watched great small businesses lose visibility —
+              not because they stopped trying, but because the world moved into
+              our phones and big brands learned how to stay in front of people.
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              Our goal is simple: make it easy for locals to find you, follow
+              you, and save with you. Every follow, every saved deal, every
+              testimonial — that’s your community saying, “we see you.”
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Fill out the short form below so we can set you up in the right
+              city and put your first offer where people are already looking.
+              This isn’t a contract — it’s just us getting you live during the
+              free trial window.
+            </p>
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="mt-4 inline-block rounded-lg bg-[#F15A29] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-black hover:text-white transition"
-          >
-            Request My Page →
-          </button>
-        </form>
+        </div>
       </section>
 
-      {/* Promise / Social Proof */}
-      <section className="mt-10 rounded-xl border bg-black p-6 text-white">
-        <div className="text-lg font-semibold text-orange-400">
-          Why businesses join Local Deals 24/7
-        </div>
-        <ul className="mt-4 space-y-3 text-sm leading-relaxed text-gray-200">
-          <li>• You get a public page you can send to customers.</li>
-          <li>• You can post daily/limited deals — “today only,” “this weekend,” etc.</li>
-          <li>• We bring you local buyers who actually show up.</li>
-          <li>• You don’t need to learn ads. We already speak customer.</li>
-        </ul>
-        <div className="mt-4 text-[11px] text-gray-400 italic">
-          Your dollars stay local. Your neighbors stay in business.
+      {/* Form – main focus */}
+      <section className="max-w-5xl mx-auto pb-16 px-4 lg:px-0">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">
+            Tell us about your business
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">
+            This isn’t a contract. This just lets us reach out and get you set
+            up on Local Deals 24/7.
+          </p>
+
+          <form className="space-y-5">
+            {/* Business name */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Business Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                defaultValue="Tony’s Pizza"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Your business name"
+              />
+            </div>
+
+            {/* Business type */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                What kind of business are you?{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <option value="">Select one…</option>
+                <option>Restaurant / Food</option>
+                <option>Salon / Barber</option>
+                <option>Fitness / Wellness</option>
+                <option>Services / Home</option>
+                <option>Retail / Boutique</option>
+                <option>Other local business</option>
+              </select>
+            </div>
+
+            {/* City / State */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  City <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  defaultValue="New Haven"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  State <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  defaultValue="CT"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Best way to reach you (phone or email){" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="203-555-1234 or owner@tonyspizza.com"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+
+            {/* First deal */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                What kind of deal would you want to promote first?
+              </label>
+              <textarea
+                rows={3}
+                defaultValue="2 slices + drink for $5 (normally $9)"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Give us something simple. We can help you make it look good in
+                LD247.
+              </p>
+            </div>
+
+            {/* Submit */}
+            <div className="pt-3">
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-900 transition-colors"
+              >
+                Start my free trial setup
+              </button>
+              <p className="text-xs text-gray-400 mt-2">
+                A local rep will contact you to finish your listing.
+              </p>
+            </div>
+          </form>
         </div>
       </section>
     </main>
