@@ -1,0 +1,143 @@
+.wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brandText {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #111;
+  letter-spacing: 0.2px;
+}
+
+.nav {
+  display: none;
+  gap: 18px;
+  align-items: center;
+}
+
+.link {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.link:hover {
+  color: #ff7a00;
+}
+
+.active {
+  color: #ff7a00;
+  border-bottom: 2px solid #ff7a00;
+  padding-bottom: 2px;
+}
+
+.citiesGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.citiesLabel {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.citySelect {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Burger (mobile) */
+.burger {
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.burgerLine {
+  width: 22px;
+  height: 2px;
+  background: #111;
+}
+
+/* Mobile drawer */
+.mobile {
+  display: none;
+  flex-direction: column;
+  padding: 8px 16px 16px;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+.mobileOpen {
+  display: flex;
+}
+
+.mLink {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.mLink:hover {
+  color: #ff7a00;
+}
+
+.mCities {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mLabel {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.mSelect {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* ≥768px show desktop nav, hide burger/mobile */
+@media (min-width: 768px) {
+  .nav {
+    display: inline-flex;
+  }
+  .burger {
+    display: none;
+  }
+  .mobile {
+    display: none !important;
+  }
+}
