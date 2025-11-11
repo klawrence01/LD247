@@ -1,3 +1,4 @@
+// src/app/VendorDashboard/coupons/_components/DealForm.tsx
 "use client";
 
 import React, { useState } from "react";
