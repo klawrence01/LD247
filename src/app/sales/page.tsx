@@ -81,114 +81,171 @@ export default function SalesLeadPage() {
         </div>
       </section>
 
-      {/* Form – main focus */}
+      {/* Form + Quick Local Note side-by-side */}
       <section className="max-w-5xl mx-auto pb-16 px-4 lg:px-0">
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">
-            Tell us about your business
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            This isn’t a contract. This just lets us reach out and get you set
-            up on Local Deals 24/7.
-          </p>
+        <div className="grid lg:grid-cols-[1.05fr_0.6fr] gap-8 items-start">
+          {/* MAIN FORM */}
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm">
+            <h2 className="text-xl font-semibold mb-2">
+              Tell us about your business
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">
+              This isn’t a contract. This just lets us reach out and get you set
+              up on Local Deals 24/7.
+            </p>
 
-          <form className="space-y-5">
-            {/* Business name */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Business Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                defaultValue="Tony’s Pizza"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                placeholder="Your business name"
-              />
-            </div>
-
-            {/* Business type */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                What kind of business are you?{" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                <option value="">Select one…</option>
-                <option>Restaurant / Food</option>
-                <option>Salon / Barber</option>
-                <option>Fitness / Wellness</option>
-                <option>Services / Home</option>
-                <option>Retail / Boutique</option>
-                <option>Other local business</option>
-              </select>
-            </div>
-
-            {/* City / State */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form className="space-y-5">
+              {/* Business name */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  City <span className="text-red-500">*</span>
+                  Business Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  defaultValue="New Haven"
+                  defaultValue="Tony’s Pizza"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Your business name"
                 />
               </div>
+
+              {/* Business type */}
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  State <span className="text-red-500">*</span>
+                  What kind of business are you?{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                  <option value="">Select one…</option>
+                  <option>Restaurant / Food</option>
+                  <option>Salon / Barber</option>
+                  <option>Fitness / Wellness</option>
+                  <option>Services / Home</option>
+                  <option>Retail / Boutique</option>
+                  <option>Other local business</option>
+                </select>
+              </div>
+
+              {/* City / State */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    City <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="New Haven"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    State <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="CT"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Best way to reach you (phone or email){" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  defaultValue="CT"
+                  placeholder="203-555-1234 or owner@tonyspizza.com"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
+
+              {/* First deal */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  What kind of deal would you want to promote first?
+                </label>
+                <textarea
+                  rows={3}
+                  defaultValue="2 slices + drink for $5 (normally $9)"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Give us something simple. We can help you make it look good in
+                  LD247.
+                </p>
+              </div>
+
+              {/* Submit */}
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-900 transition-colors"
+                >
+                  Start my free trial setup
+                </button>
+                <p className="text-xs text-gray-400 mt-2">
+                  A local rep will contact you to finish your listing.
+                </p>
+              </div>
+            </form>
+          </div>
+
+          {/* QUICK LOCAL NOTE / REGIONAL NEWSLETTER */}
+          <div className="space-y-4">
+            <div className="bg-gray-50 border border-gray-200 rounded-3xl p-5">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                Quick Local Note
+              </h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Use this to draft a short message for businesses in your region.
+                Later, the <strong>regional salesforce</strong> can approve and
+                push this as a local newsletter.
+              </p>
+              <form className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Example: New Haven vendors — we’re opening slots"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Message
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Tell vendors about an upcoming promo, city launch, or ad slot..."
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-2 rounded-lg transition"
+                >
+                  Save draft for regional team
+                </button>
+                <p className="text-[10px] text-gray-400">
+                  Later: save to Supabase table e.g. <code>regional_notes</code>{" "}
+                  with region_id.
+                </p>
+              </form>
             </div>
 
-            {/* Contact */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Best way to reach you (phone or email){" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="203-555-1234 or owner@tonyspizza.com"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-
-            {/* First deal */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                What kind of deal would you want to promote first?
-              </label>
-              <textarea
-                rows={3}
-                defaultValue="2 slices + drink for $5 (normally $9)"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Give us something simple. We can help you make it look good in
-                LD247.
+            <div className="bg-white border border-gray-100 rounded-2xl p-4">
+              <p className="text-xs text-gray-500">
+                Newsletter path: sales rep drafts → regional salesforce reviews →
+                local list receives branded LD247 email → future: sponsors/ads
+                inside newsletter.
               </p>
             </div>
-
-            {/* Submit */}
-            <div className="pt-3">
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-900 transition-colors"
-              >
-                Start my free trial setup
-              </button>
-              <p className="text-xs text-gray-400 mt-2">
-                A local rep will contact you to finish your listing.
-              </p>
-            </div>
-          </form>
+          </div>
         </div>
       </section>
     </main>
