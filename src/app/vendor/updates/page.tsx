@@ -1,48 +1,19 @@
+// src/app/vendor/updates/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
+import React from "react";
 
 export default function VendorUpdatesPage() {
-  const [updates, setUpdates] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadUpdates() {
-      const supabase = getSupabaseBrowserClient();
-      const { data, error } = await supabase.from("vendor_updates").select("*");
-
-      if (error) {
-        console.error("Error loading vendor updates:", error);
-      } else {
-        console.log("Vendor updates:", data);
-        setUpdates(data || []);
-      }
-
-      setLoading(false);
-    }
-
-    loadUpdates();
-  }, []);
-
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">Vendor Updates</h1>
-
-      {loading ? (
-        <p>Loading updates...</p>
-      ) : updates.length === 0 ? (
-        <p>No updates found.</p>
-      ) : (
-        <ul className="space-y-2">
-          {updates.map((item) => (
-            <li key={item.id} className="border p-2 rounded-md bg-white">
-              <p className="font-medium">{item.title}</p>
-              <p className="text-sm text-gray-500">{item.description}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="min-h-screen bg-slate-950 text-white px-6 py-10">
+      <h1 className="text-2xl font-bold mb-4">Vendor Updates</h1>
+      <p className="text-slate-300 text-sm mb-6">
+        Placeholder updates page. Removed unused getSupabaseBrowserClient()
+        import so Vercel can build. Wire this to Supabase later.
+      </p>
+      <div className="rounded-xl border border-slate-200/10 bg-slate-900/40 p-4">
+        <p className="text-slate-200 text-sm">No updates yet.</p>
+      </div>
     </div>
   );
 }
