@@ -1,9 +1,10 @@
 // src/lib/supabase/server.ts
-// unified server/browser supabase helper so all pages can import from here
+// unified supabase helper so all pages that do
+// "@/lib/supabase/server" will work (admin, merchant, city, etc.)
 
 import { createBrowserClient } from "@supabase/ssr";
 
-// the function most pages want:
+// the main helper most pages expect
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,9 +12,8 @@ export function createClient() {
   );
 }
 
-// some of your pages do `import { supabase } ...`
-// so give them a ready-made client too:
+// some of your pages do: `import { supabase } from "@/lib/supabase/server"`
 export const supabase = createClient();
 
-// and if anything was doing a default import, this keeps it happy:
+// some may even do a default import
 export default createClient;
