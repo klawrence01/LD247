@@ -22,7 +22,6 @@ export default function DealForm({ onSubmit }: DealFormProps) {
       end_date: endDate,
     };
     onSubmit?.(payload);
-    // for now just log it so build doesn’t break
     console.log("new deal:", payload);
   };
 
