@@ -2,13 +2,15 @@
 
 export const dynamic = "force-dynamic";
 
-type PageProps = {
+type VendorDashboardPageProps = {
   params: {
     id: string;
   };
 };
 
-export default async function VendorDashboardPage({ params }: PageProps) {
+export default async function VendorDashboardPage({
+  params,
+}: VendorDashboardPageProps) {
   const { id } = params;
 
   return (
