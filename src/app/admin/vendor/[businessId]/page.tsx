@@ -1,12 +1,8 @@
 // C:\Users\Owner\ld247\src\app\admin\vendor\[businessId]\page.tsx
 
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+export const dynamic = "force-dynamic";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-// Local Supabase client – no "@/lib/supabase..." imports
-const supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createSupabaseServerClient } from "@/lib/supabase";
 
 type VendorPageProps = {
   params: {
@@ -27,6 +23,7 @@ export default async function AdminVendorDetailPage({
   params,
 }: VendorPageProps) {
   const { businessId } = params;
+  const supabase = createSupabaseServerClient();
 
   let business: Business | null = null;
   let loadError: string | null = null;
@@ -71,7 +68,8 @@ export default async function AdminVendorDetailPage({
 
           {!loadError && !business && (
             <p className="text-sm text-slate-400">
-              No vendor found for ID <span className="font-mono">{businessId}</span>.
+              No vendor found for ID{" "}
+              <span className="font-mono">{businessId}</span>.
             </p>
           )}
 
@@ -128,4 +126,13 @@ export default async function AdminVendorDetailPage({
 
               <p className="mt-4 text-xs text-slate-500">
                 NOTE: Approve / deny / edit actions will be hooked up via server
-                actions later. This version is intention
+                actions later. This version is intentionally read-only so we can
+                ship a stable admin center first.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

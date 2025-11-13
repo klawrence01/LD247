@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { createClient } from '@/lib/supabaseServer';
+import { createSupabaseServerClient } from "@/lib/supabase";
 
 type Biz = {
   id: string;
@@ -10,7 +10,7 @@ type Biz = {
 };
 
 export default async function ApprovalsPage() {
-  const supabase = createClient();
+  const supabase = createSupabaseServerClient();
 
   // Note: kept very safe for build. If table names differ, the page still compiles;
   // runtime is dynamic, so it won't be executed at build time.

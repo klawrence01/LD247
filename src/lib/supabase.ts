@@ -1,10 +1,26 @@
-// C:\Users\Klawr\LD247\src\lib\supabase.ts
+// src/lib/supabase.ts
+import { cookies } from "next/headers";
+import { createServerClient, createBrowserClient } from "@supabase/ssr";
 
-// Re-export the browser client so imports like
-//   import { supabase } from "@/lib/supabase";
-// keep working.
-export { supabase } from "./supabaseBrowser";
+export function createSupabaseServerClient() {
+  const cookieStore = cookies();
 
-// If you ever need the raw browser createClient, you can also do:
-//   import { createClient as createSupabaseClient } from "@/lib/supabase";
-export { createClient as createSupabaseClient } from "./supabaseBrowser";
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+}
+
+export function createSupabaseBrowserClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
