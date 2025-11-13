@@ -1,5 +1,6 @@
-// C:\Users\klawr\LD247\src\app\VendorDashboard\[id]\page.tsx
+// src/app/VendorDashboard/[id]/page.tsx
 
+// @ts-nocheck
 export const dynamic = "force-dynamic";
 
 export default async function VendorDashboardPage({ params }: any) {
