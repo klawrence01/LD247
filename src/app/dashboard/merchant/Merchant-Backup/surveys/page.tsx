@@ -1,49 +1,15 @@
-'use client';
+// C:\Users\klawr\LD247\src\app\dashboard\merchant\Merchant-Backup\surveys\page.tsx
 
-import { supabase } from '@/lib/supabaseBrowser';
-import { useEffect, useState } from 'react';
+export const dynamic = "force-dynamic";
 
-type Survey = { id: string; title: string; created_at: string };
-
-export default function SurveysBackupPage() {
-  const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data } = await supabase
-        .from('surveys')
-        .select('id,title,created_at')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (mounted) {
-        setSurveys(data ?? []);
-        setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
+export default function MerchantBackupSurveysPage() {
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Surveys (Backup)</h1>
-      {loading ? (
-        <p>Loading…</p>
-      ) : surveys.length === 0 ? (
-        <p>No surveys yet.</p>
-      ) : (
-        <ul className="list-disc pl-6">
-          {surveys.map((s) => (
-            <li key={s.id}>
-              <span className="font-medium">{s.title}</span>{' '}
-              <span className="text-sm text-gray-500">
-                ({new Date(s.created_at).toLocaleDateString()})
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold">Merchant Surveys (Backup)</h1>
+      <p className="mt-2 text-sm text-gray-500">
+        This is a placeholder backup surveys page. Real survey data will be
+        wired in later once deployment is stable.
+      </p>
     </div>
   );
 }

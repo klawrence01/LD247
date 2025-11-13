@@ -1,4 +1,4 @@
-// C:\Users\Owner\ld247\src\app\admin\vendor\[businessId]\page.tsx
+// C:\Users\klawr\LD247\src\app\admin\vendor\[businessId]\page.tsx
 
 export const dynamic = "force-dynamic";
 
@@ -54,8 +54,8 @@ export default async function AdminVendorDetailPage({
             Vendor Details
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Admin view for a single LocalDeals247 business. Actions can be wired
-            up later.
+            Admin view for a single LocalDeals247 business. Actions can be
+            wired up later.
           </p>
         </header>
 

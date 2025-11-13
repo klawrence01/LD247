@@ -1,41 +1,38 @@
-export const dynamic = 'force-dynamic';
+// C:\Users\klawr\LD247\src\app\city\[city]\[slug]\page.tsx
 
-import { createClient } from '@/lib/supabaseServer';
+export const dynamic = "force-dynamic";
 
-export default async function CitySlugPage({
-  params,
-  searchParams,
-}: {
-  params: { city: string; slug: string };
-  searchParams?: Record<string, string | string[] | undefined>;
-}) {
-  const supabase = createClient();
+type CitySlugPageProps = {
+  params: {
+    city: string;
+    slug: string;
+  };
+};
 
-  // Example minimal query; keep or replace later.
-  const { data, error } = await supabase
-    .from('vendors')
-    .select('id,name,slug,city')
-    .eq('slug', params.slug)
-    .eq('city', params.city)
-    .single();
-
-  if (error || !data) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold">Vendor not found</h1>
-        <p className="text-gray-600">
-          {params.city} / {params.slug}
-        </p>
-      </div>
-    );
-  }
+export default function CityDealDetailPage({ params }: CitySlugPageProps) {
+  const { city, slug } = params;
 
   return (
-    <div className="p-6 space-y-2">
-      <h1 className="text-2xl font-semibold">{data.name}</h1>
-      <p className="text-gray-600">
-        {data.city} • {data.slug}
-      </p>
+    <div className="min-h-screen bg-slate-950 text-slate-50 px-6 py-8">
+      <div className="mx-auto max-w-3xl space-y-4">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          City Deal Detail (Placeholder)
+        </h1>
+        <p className="text-sm text-slate-400">
+          City:{" "}
+          <span className="font-mono bg-slate-900 px-2 py-1 rounded">
+            {city}
+          </span>{" "}
+          • Slug:{" "}
+          <span className="font-mono bg-slate-900 px-2 py-1 rounded">
+            {slug}
+          </span>
+        </p>
+        <p className="text-sm text-slate-400">
+          We&apos;ll hook this page to real deal data later. For now it&apos;s
+          a routing placeholder to keep the build stable.
+        </p>
+      </div>
     </div>
   );
 }
