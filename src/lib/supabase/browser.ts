@@ -1,4 +1,4 @@
-// Browser-side Supabase client (for client components if you need them)
+// Browser-side Supabase client (for client components if needed)
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
