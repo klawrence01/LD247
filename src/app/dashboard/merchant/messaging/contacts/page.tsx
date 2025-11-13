@@ -1,4 +1,4 @@
-// C:\Users\Owner\ld247\src\app\dashboard\merchant\messaging\contacts\page.tsx
+// C:\Users\Klawr\LD247\src\app\dashboard\merchant\messaging\contacts\page.tsx
 
 export default function MerchantMessagingContactsPage() {
   return (
@@ -11,12 +11,12 @@ export default function MerchantMessagingContactsPage() {
           </h1>
           <p className="mt-1 text-sm text-slate-400">
             This is the vendor&apos;s contacts hub for the messaging center.
-            Live data and search will be wired in later. For now this page is
-            static so the project can deploy cleanly.
+            Live data and Supabase queries will be wired in later. For now this
+            page is static so the project can deploy cleanly.
           </p>
         </header>
 
-        {/* Placeholder content */}
+        {/* Placeholder card */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl">
           <h2 className="text-sm font-semibold tracking-tight">
             Contacts will appear here
