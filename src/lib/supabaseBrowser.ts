@@ -1,16 +1,4 @@
-'use client';
+// C:\Users\Owner\ld247\src\lib\supabaseBrowser.ts
+// Thin wrapper around supabaseClient for compatibility
 
-// Browser/client-only Supabase singleton
-import { createBrowserClient } from '@supabase/ssr';
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-/** Optional factory (kept for compatibility) */
-export function createClient() {
-  return supabase;
-}
-
-export default supabase;
+export { createClient, supabase, default } from "./supabaseClient";

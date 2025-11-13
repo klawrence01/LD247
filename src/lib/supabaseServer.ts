@@ -1,14 +1,14 @@
 // C:\Users\Owner\ld247\src\lib\supabaseServer.ts
+// Server-side Supabase client for Next.js (uses cookies)
 
-// SSR/server-only Supabase client wired to Next.js cookies.
 import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-/** Factory (named export) — this is what admin pages should import. */
-export function createClient() {
+export function createClient(): SupabaseClient {
   const cookieStore = cookies();
 
   return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -16,25 +16,18 @@ export function createClient() {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name: string, value: string, options: any) {
-        try {
-          cookieStore.set({ name, value, ...options });
-        } catch {
-          // ignore cookie write errors on server
-        }
+      set(name: string, value: string, options: CookieOptions) {
+        cookieStore.set({ name, value, ...options });
       },
-      remove(name: string, options: any) {
-        try {
-          cookieStore.set({ name, value: "", ...options });
-        } catch {
-          // ignore cookie remove errors on server
-        }
+      remove(name: string, options: CookieOptions) {
+        cookieStore.set({ name, value: "", ...options });
       },
     },
   });
 }
 
-/** Optional aliases (exported too) */
-export const supabase = createClient();         // if something imports { supabase } from "@/lib/supabaseServer"
-export const supabaseServer = () => createClient();
-export default createClient;
+// Many pages just import { supabase }
+export const supabase = createClient();
+
+// Default export, in case something does: import supabaseServer from ...
+export default supabase;

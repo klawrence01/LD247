@@ -1,26 +1,20 @@
-"use client";
+// C:\Users\Owner\ld247\src\lib\supabaseClient.ts
+// Browser/general Supabase client (no cookies)
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-function makeClient() {
+export function createClient(): SupabaseClient {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error("Missing Supabase environment variables");
   }
+
   return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
-// ✅ modern way
-export function createClient() {
-  return makeClient();
-}
+export const supabase = createClient();
 
-// ✅ old pages using getSupabaseBrowserClient
-export function getSupabaseBrowserClient() {
-  return makeClient();
-}
-
-// ✅ old pages doing `import { supabase } ...`
-export const supabase = makeClient();
+export default supabase;
