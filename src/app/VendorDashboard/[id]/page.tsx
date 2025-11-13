@@ -2,16 +2,8 @@
 
 export const dynamic = "force-dynamic";
 
-type VendorDashboardPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function VendorDashboardPage({
-  params,
-}: VendorDashboardPageProps) {
-  const { id } = params;
+export default async function VendorDashboardPage({ params }: any) {
+  const { id } = params ?? { id: "unknown" };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 px-6 py-8">
