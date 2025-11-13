@@ -1,31 +1,73 @@
-// app/inside-the-hustle/page.tsx
+// src/app/inside-the-hustle/[slug]/page.tsx
+import { notFound } from "next/navigation";
 
-import Link from "next/link";
-import { getPostMetadata } from "@/lib/posts";
-
-export const metadata = {
-  title: "Inside the Hustle",
-  description: "Sales tips, strategy, and behind-the-scenes wisdom to help you win.",
+type HustlePost = {
+  slug: string;
+  title: string;
+  description?: string;
+  date?: string;
+  content?: string;
 };
 
-export default async function InsideTheHustle() {
-  const posts = await getPostMetadata("inside-the-hustle");
+const MOCK_POSTS: HustlePost[] = [
+  {
+    slug: "welcome-to-the-hustle",
+    title: "Welcome to the Hustle",
+    description: "Placeholder post so the dynamic route always builds.",
+    date: "2025-01-01",
+    content:
+      "This is placeholder content for Inside the Hustle. Swap in Supabase later.",
+  },
+];
+
+export default async function InsideTheHustlePostPage({
+  params,
+}: {
+  // 👇 this matches what .next/types is expecting right now
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  const post = MOCK_POSTS.find((p) => p.slug === slug);
+
+  if (!post) {
+    // you can use notFound() if you want
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="text-2xl font-semibold mb-2">Post not found</h1>
+        <p className="text-sm text-muted-foreground">
+          We couldn&apos;t find a post with slug: {slug}
+        </p>
+      </div>
+    );
+    // or: notFound();
+  }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">Inside the Hustle</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/inside-the-hustle/${post.slug}`}
-            className="border rounded-lg p-5 shadow-md hover:shadow-xl transition"
-          >
-            <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-            <p className="text-sm text-gray-500">{post.date}</p>
-            <p className="text-sm mt-2 text-gray-700 line-clamp-3">{post.description}</p>
-          </Link>
-        ))}
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
+        {post.description ? (
+          <p className="text-muted-foreground">{post.description}</p>
+        ) : null}
+        {post.date ? (
+          <p className="text-xs text-muted-foreground">
+            {new Date(post.date).toLocaleDateString()}
+          </p>
+        ) : null}
+      </header>
+
+      <article className="prose prose-slate max-w-none">
+        <p>{post.content ?? "Placeholder content. Hook DB later."}</p>
+      </article>
+
+      <div className="mt-6">
+        <a
+          href="/inside-the-hustle"
+          className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          ← Back to Inside the Hustle
+        </a>
       </div>
     </div>
   );

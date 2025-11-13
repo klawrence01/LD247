@@ -1,31 +1,41 @@
-import Link from "next/link";
-import { createSupabaseServer } from "@/utils/supabase/server";
+// /src/app/dashboard/merchant/Merchant-Backup/messaging/sent/page.tsx
+import {
+  createSupabaseServerClient,
+  createSupabaseServer,
+} from "@/utils/supabase/server";
 
-export const metadata = { title: "Sent Notes" };
+export default async function MerchantBackupSentMessagesPage() {
+  // must await now because our helper is async
+  const supabase = await createSupabaseServerClient(); // or: await createSupabaseServer();
 
-export default async function SentPage() {
-  const supabase = createSupabaseServer();
-  const { data: rows } = await supabase
+  const { data: rows = [], error } = await supabase
     .from("messages")
     .select("id, subject, created_at")
-    .eq("status","sent")
-    .order("created_at",{ascending:false});
+    .eq("status", "sent")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("sent messages fetch failed", error);
+  }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Sent Notes</h1>
-        <Link href="/dashboard/merchant/messaging" className="text-sm underline">Back</Link>
-      </div>
-      <div className="mt-6 space-y-2">
-        {(rows ?? []).map(m => (
-          <div key={m.id} className="rounded-lg border px-4 py-3">
-            <div className="font-medium">{m.subject}</div>
-            <div className="text-xs text-gray-500">{new Date(m.created_at).toLocaleString()}</div>
-          </div>
-        ))}
-        {(rows ?? []).length === 0 && <div className="text-gray-500 text-sm">You haven’t sent any notes yet.</div>}
-      </div>
+    <div className="p-6 space-y-4">
+      <h1 className="text-2xl font-bold mb-2">Sent Messages (Backup)</h1>
+
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No sent messages.</p>
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((m: any) => (
+            <li key={m.id} className="border rounded-lg p-3 bg-white">
+              <h2 className="font-semibold">{m.subject}</h2>
+              <p className="text-xs text-muted-foreground">
+                {m.created_at}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

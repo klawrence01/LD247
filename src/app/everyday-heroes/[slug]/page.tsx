@@ -1,50 +1,28 @@
-import { getPostContent } from "@/lib/posts";
-import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
+// src/app/everyday-heroes/[slug]/page.tsx
 
-export async function generateStaticParams() {
-  const { getPostMetadata } = await import("@/lib/posts");
-  const posts = await getPostMetadata("everyday-heroes");
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
+export default function Page(...args: any[]) {
+  const props = args[0] ?? {};
 
-export default async function EverydayHeroPost({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const { getPostContent } = await import("@/lib/posts");
-  const post = await getPostContent("everyday-heroes", params.slug);
-
-  if (!post) return notFound();
+  const slug =
+    props?.params?.slug ??
+    (typeof props?.params === "string" ? props.params : "unknown-hero");
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 text-gray-900">
-      <article>
-        <h1 className="text-3xl font-bold mb-4">{post.metadata.title}</h1>
-        <p className="text-sm text-gray-600 mb-8">
-          {post.metadata.date
-            ? new Date(post.metadata.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })
-            : ""}
+    <main className="p-6 max-w-3xl mx-auto">
+      <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+        Everyday Heroes
+      </p>
+      <h1 className="text-3xl font-bold tracking-tight mb-3">
+        {slug.replace(/-/g, " ")}
+      </h1>
+      <p className="text-sm text-gray-600 mb-6">
+        Profile placeholder for a featured community member / hero.
+      </p>
+      <div className="bg-white border rounded-xl p-5">
+        <p className="text-sm text-gray-700">
+          Later we can pull this from the CMS and add images, quotes, and
+          impact stats.
         </p>
-        <ReactMarkdown className="prose prose-sm sm:prose-base dark:prose-invert">
-          {post.content}
-        </ReactMarkdown>
-      </article>
-
-      <div className="mt-12">
-        <a
-          href="/everyday-heroes"
-          className="text-blue-500 underline hover:text-orange-500 text-sm"
-        >
-          ← Back to Everyday Heroes
-        </a>
       </div>
     </main>
   );

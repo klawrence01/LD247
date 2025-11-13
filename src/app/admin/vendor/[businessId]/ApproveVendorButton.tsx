@@ -1,81 +1,36 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { approveBusiness } from "./actions";
-import { useRouter } from "next/navigation";
+import React, { useTransition, useState } from "react";
 
-export default function ApproveVendorButton({
-  businessId,
-  currentStatus,
-}: {
-  businessId: string;
-  currentStatus: string | null;
-}) {
-  const router = useRouter();
-  const [msg, setMsg] = useState<string | null>(null);
+export default function ApproveVendorButton({ businessId }: { businessId: string }) {
   const [isPending, startTransition] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const isAlreadyActive =
-    currentStatus &&
-    ["active", "live", "approved"].includes(currentStatus.toLowerCase());
-
-  async function handleApprove() {
-    setMsg(null);
-
+  const handleApprove = () => {
     startTransition(async () => {
-      const resp = await approveBusiness({ businessId });
+      try {
+        // placeholder “approve” — this is where your real server action will go later
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
-      if (!resp.ok) {
-        setMsg(resp.message || "Failed to approve vendor.");
-        return;
+        console.log("approved business", businessId);
+        setMsg("Vendor approved.");
+      } catch (err) {
+        console.error(err);
+        setMsg("Failed to approve vendor.");
       }
-
-      setMsg("Vendor approved and set to active.");
-      // refresh server component data so status updates on page
-      router.refresh();
     });
-  }
+  };
 
   return (
-    <div className="text-[13px] bg-neutral-900 border border-neutral-800 rounded-xl p-4">
-      <div className="text-neutral-400 text-[11px] uppercase font-semibold tracking-wide mb-2">
-        Status Control
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="text-neutral-300 leading-snug text-[13px]">
-          Current status:{" "}
-          <span className="inline-block text-[11px] font-medium bg-neutral-800 border border-neutral-700 text-neutral-200 rounded px-2 py-1 align-middle">
-            {currentStatus || "—"}
-          </span>
-        </div>
-
-        {isAlreadyActive ? (
-          <div className="text-[12px] text-neutral-500 leading-snug bg-neutral-800/40 border border-neutral-700 rounded-lg px-3 py-2">
-            This vendor is already live.
-          </div>
-        ) : (
-          <>
-            <button
-              disabled={isPending}
-              onClick={handleApprove}
-              className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[12px] rounded-lg px-3 py-2 border border-orange-500/40 text-center"
-            >
-              {isPending ? "Approving…" : "Approve & Go Live"}
-            </button>
-
-            <p className="text-[11px] text-neutral-500 leading-snug">
-              This will mark the vendor as active and visible to the network.
-            </p>
-          </>
-        )}
-
-        {msg && (
-          <div className="text-[12px] text-neutral-300 bg-neutral-800/40 border border-neutral-700 rounded-lg px-3 py-2 leading-snug">
-            {msg}
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col items-start gap-2">
+      <button
+        onClick={handleApprove}
+        disabled={isPending}
+        className="px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700 disabled:opacity-60"
+      >
+        {isPending ? "Approving..." : "Approve Vendor"}
+      </button>
+      {msg && <p className="text-sm text-gray-700">{msg}</p>}
     </div>
   );
 }

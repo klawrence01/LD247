@@ -1,187 +1,108 @@
+// src/components/city/CityClient.tsx
 "use client";
 
-import { useState } from "react";
-import { Deal } from "@/utils/deals";
 import Image from "next/image";
-import Link from "next/link";
 
-interface CityClientProps {
-  city: string;
-  cityName?: string;
-  todayISO: string;
-  deals: Deal[];
-}
+type Deal = {
+  id: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  price?: number;
+  vendorName?: string;
+  address?: string;
+  // add more later as your real data shape shows up
+};
+
+type CityClientProps = {
+  cityName: string;
+  citySlug: string;
+  cityDisplayLoud?: string;
+  deals?: Deal[];
+};
 
 export default function CityClient({
-  city,
   cityName,
-  todayISO,
-  deals,
+  citySlug,
+  cityDisplayLoud,
+  deals = [],
 }: CityClientProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date(todayISO));
-
-  const displayCity = cityName ?? city?.toUpperCase() ?? "Unknown City";
-
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(todayISO);
-    date.setDate(date.getDate() + i);
-    return date;
-  });
-
-  const handleDateClick = (date: Date) => {
-    setSelectedDate(date);
-  };
-
   return (
-    <main className="max-w-5xl w-full mx-auto px-4 py-10">
-      {/* HEADER */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight uppercase">
-          {displayCity}
-        </h1>
-        <p className="text-base text-slate-700">
-          Everyday Deals. Everyday Heroes.
-        </p>
-        <p className="text-sm text-slate-400">
-          Showing deals for:{" "}
-          {selectedDate.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
+        {/* header */}
+        <header className="border-b pb-4">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+            City
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {cityName || citySlug}
+          </h1>
+          {cityDisplayLoud ? (
+            <p className="text-sm text-muted-foreground">{cityDisplayLoud}</p>
+          ) : null}
+        </header>
 
-      {/* SEARCH BAR */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-2 mb-6">
-        <select className="border rounded-lg px-3 py-2 w-48" value={displayCity}>
-          <option>{displayCity}</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Search for pizza, barbershop etc"
-          className="border rounded-lg px-3 py-2 w-full md:w-1/2"
+        {/* deals list */}
+        <section className="grid gap-4 md:grid-cols-2">
+          {deals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No deals for this city yet.
+            </p>
+          ) : (
+            deals.map((deal) => (
+              <DealCard key={deal.id} deal={deal} />
+            ))
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function DealCard({ deal }: { deal: Deal }) {
+  return (
+    <div className="flex gap-4 rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+      {/* optional image spot */}
+      <div className="relative h-32 w-40 flex-shrink-0 bg-muted">
+        <Image
+          src="/placeholder.svg"
+          alt={deal.title ?? "Deal"}
+          fill
+          className="object-cover"
         />
       </div>
 
-      {/* MINI CALENDAR */}
-      <div className="flex justify-center gap-2 mb-8">
-        {days.map((d) => {
-          const isSelected =
-            d.toDateString() === selectedDate.toDateString();
-          return (
-            <button
-              key={d.toDateString()}
-              onClick={() => handleDateClick(d)}
-              className={`rounded-md border px-3 py-2 text-center text-sm font-medium ${
-                isSelected
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              <div>{d.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}</div>
-              <div>{d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</div>
-            </button>
-          );
-        })}
-      </div>
+      <div className="flex flex-1 flex-col py-3 pr-3">
+        <h2 className="text-base font-semibold line-clamp-1">
+          {deal.title ?? "Untitled deal"}
+        </h2>
 
-      {/* DEAL LIST */}
-      {deals.length > 0 ? (
-        <div className="space-y-6">
-          {deals.map((deal) => (
-            <div
-              key={deal.id}
-              className="flex flex-col md:flex-row items-center bg-white rounded-xl shadow-sm border border-gray-200 p-4 gap-4"
-            >
-              {/* IMAGE */}
-              {deal.image_url && (
-                <div className="relative w-full md:w-40 h-32 rounded-md overflow-hidden">
-                  <Image
-                    src={deal.image_url}
-                    alt={deal.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+        {/* safe description line */}
+        {deal.description ? (
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+            {deal.description}
+          </p>
+        ) : null}
 
-              {/* TEXT */}
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-xl font-bold">{deal.title}</h3>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          {deal.category ? (
+            <span className="rounded bg-muted px-2 py-0.5 text-[0.65rem] uppercase tracking-wide">
+              {deal.category}
+            </span>
+          ) : null}
 
-                {/* 🔸 Bold Offer Line */}
-                {deal.description && (
-                  <p className="font-bold text-orange-600 mt-1">
-                    {deal.description.replace(/\*\*/g, "")}
-                  </p>
-                )}
+          {typeof deal.price === "number" ? (
+            <span>${deal.price.toFixed(2)}</span>
+          ) : null}
 
-                {/* Rating */}
-                <div className="flex justify-center md:justify-start items-center mt-1">
-                  {"⭐".repeat(Math.round(deal.rating ?? 4))}
-                </div>
+          {deal.vendorName ? <span>• {deal.vendorName}</span> : null}
 
-                {/* Address / Hours */}
-                <p className="text-sm text-slate-600 mt-1">
-                  {deal.address ?? ""}{" "}
-                  {deal.start_date
-                    ? ` | ${new Date(deal.start_date).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })} - ${new Date(
-                        deal.end_date ?? deal.start_date
-                      ).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}`
-                    : ""}
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col gap-2 items-center">
-                <Link
-                  href={deal.vendor?.website ?? "#"}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-md text-sm transition"
-                >
-                  View Deal
-                </Link>
-                <button className="text-sm text-gray-600 hover:text-orange-600">
-                  Share this deal
-                </button>
-              </div>
-            </div>
-          ))}
+          {deal.address ? (
+            <span className="truncate max-w-[10rem]">{deal.address}</span>
+          ) : null}
         </div>
-      ) : (
-        <p className="text-center text-slate-500 italic mt-10">
-          No deals yet. Check other days.
-        </p>
-      )}
-
-      {/* 🧡 BEHIND THE HUSTLE FOOTER */}
-      <div className="bg-black text-white mt-16 rounded-2xl p-6 md:p-8 shadow-md">
-        <h3 className="text-orange-500 font-bold text-lg mb-3">
-          Behind the Hustle
-        </h3>
-        <p className="text-sm leading-relaxed">
-          <strong>Local Deals 24/7</strong> exists for small business owners —
-          the barbers, the pizza shops, the nail techs, the chiropractors, the
-          people who keep your city alive. We help them get attention without
-          paying crazy ad money.
-        </p>
-        <p className="text-sm mt-4">
-          <Link
-            href="/blog"
-            className="text-blue-400 hover:text-blue-300 font-semibold"
-          >
-            Meet the Local Heroes
-          </Link>{" "}
-          keeping this city alive.
-        </p>
       </div>
-    </main>
+    </div>
   );
 }

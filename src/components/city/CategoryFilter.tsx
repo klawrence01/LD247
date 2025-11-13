@@ -1,20 +1,27 @@
-import React from 'react';
+// src/components/city/CategoryFilter.tsx
+const categories = ["All", "Food", "Beauty", "Auto", "Health", "Fun"];
 
-const categories = ['Food', 'Beauty', 'Health', 'Auto', 'Fitness', 'Retail'];
-
-const CategoryFilter = () => {
+export default function CategoryFilter({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
   return (
-    <div className="flex flex-wrap justify-center gap-3 py-6">
-      {categories.map((category) => (
+    <div className="flex gap-2 mb-4 flex-wrap">
+      {categories.map((cat) => (
         <button
-          key={category}
-          className="px-4 py-2 rounded-full border border-gray-300 hover:bg-orange-100 text-sm"
+          key={cat}
+          type="button"
+          onClick={() => onChange(cat)}
+          className={`px-3 py-1 rounded-full text-sm border ${
+            value === cat ? "bg-orange-500 text-white" : "bg-white"
+          }`}
         >
-          {category}
+          {cat}
         </button>
       ))}
     </div>
   );
-};
-
-export default CategoryFilter;
+}

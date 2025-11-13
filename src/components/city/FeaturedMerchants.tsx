@@ -1,21 +1,30 @@
-import React from 'react';
+// src/components/city/FeaturedMerchants.tsx
+type Merchant = {
+  id: string;
+  name: string;
+  tagline?: string;
+};
 
-const merchants = ['Glow Spa', 'Muscle Gym', 'Sunset Café'];
+export default function FeaturedMerchants({
+  merchants = [],
+}: {
+  merchants?: Merchant[];
+}) {
+  if (!merchants.length) return null;
 
-const FeaturedMerchants = () => {
   return (
-    <section className="px-6 py-6 bg-white">
-      <h3 className="text-xl font-semibold mb-4">Featured Merchants</h3>
-      <div className="flex flex-wrap gap-4 justify-center">
-        {merchants.map((name) => (
-          <div key={name} className="p-4 border rounded-lg shadow-sm w-40 text-center">
-            <div className="h-20 bg-gray-200 mb-2" />
-            <p className="text-sm font-medium">{name}</p>
+    <div className="mb-6">
+      <h2 className="text-lg font-semibold mb-3">Featured Merchants</h2>
+      <div className="grid gap-3 md:grid-cols-3">
+        {merchants.map((m) => (
+          <div key={m.id} className="rounded-lg border p-4 bg-white">
+            <h3 className="font-semibold">{m.name}</h3>
+            {m.tagline ? (
+              <p className="text-sm text-muted-foreground">{m.tagline}</p>
+            ) : null}
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
-};
-
-export default FeaturedMerchants;
+}

@@ -1,87 +1,78 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { assignRepToBusiness } from "./actions";
-import { useRouter } from "next/navigation";
+import React, { useState, useTransition } from "react";
 
-export default function AssignRepForm({
-  businessId,
-  currentRepId,
-  reps,
-  hotRepIds,
-}: {
-  businessId: string;
-  currentRepId: string | null;
-  reps: { id: string; name: string; territory: string | null }[];
-  hotRepIds: string[];
-}) {
-  const router = useRouter();
-  const [selectedRep, setSelectedRep] = useState<string | "">(currentRepId || "");
-  const [msg, setMsg] = useState<string | null>(null);
+type RepOption = {
+  id: string;
+  name: string;
+};
+
+// later you can pass these in from the page
+const MOCK_REPS: RepOption[] = [
+  { id: "rep-1", name: "Unassigned" },
+  { id: "rep-2", name: "Jane Doe" },
+  { id: "rep-3", name: "John Smith" },
+];
+
+export default function AssignRepForm({ businessId }: { businessId: string }) {
   const [isPending, startTransition] = useTransition();
+  const [selectedRep, setSelectedRep] = useState<string>("rep-1");
+  const [msg, setMsg] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setMsg(null);
 
     startTransition(async () => {
-      const resp = await assignRepToBusiness({
-        businessId,
-        repId: selectedRep === "" ? null : selectedRep,
-      });
+      try {
+        // placeholder for real server action
+        await new Promise((res) => setTimeout(res, 400));
 
-      if (!resp.ok) {
-        setMsg(resp.message || "Update failed.");
-        return;
+        console.log("assigned rep", {
+          businessId,
+          repId: selectedRep === "rep-1" ? null : selectedRep,
+        });
+
+        setMsg("Rep assignment saved.");
+      } catch (err) {
+        console.error(err);
+        setMsg("Failed to save rep assignment.");
       }
-
-      setMsg("Rep updated.");
-      router.refresh();
     });
-  }
-
-  function labelForRep(r: { id: string; name: string; territory: string | null }) {
-    const flame = hotRepIds.includes(r.id) ? " 🔥" : "";
-    const terr = r.territory ? ` (${r.territory})` : "";
-    return `${r.name}${terr}${flame}`;
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 text-[13px]">
-      <div className="flex flex-col gap-2">
-        <label className="text-[11px] text-neutral-400 uppercase tracking-wide font-semibold">
-          Assign to Rep
-        </label>
-        <select
-          className="bg-neutral-800 border border-neutral-700 rounded-lg px-2 py-2 text-neutral-100 text-[13px] outline-none"
-          value={selectedRep}
-          onChange={(e) => setSelectedRep(e.target.value)}
-        >
-          <option value="">— Unassigned —</option>
-          {reps.map((r) => (
-            <option key={r.id} value={r.id}>
-              {labelForRep(r)}
-            </option>
-          ))}
-        </select>
-      </div>
+    <form onSubmit={handleSubmit} className="mt-4 p-4 border rounded-md bg-white shadow-sm flex flex-col gap-3 max-w-md">
+      <h3 className="text-sm font-semibold text-gray-900">Assign Sales Rep</h3>
 
-      {msg && (
-        <div className="text-[12px] text-neutral-300 bg-neutral-800/40 border border-neutral-700 rounded-lg px-2 py-2 leading-snug">
-          {msg}
-        </div>
-      )}
+      <label className="text-xs text-gray-600" htmlFor="rep">
+        Select rep for this business
+      </label>
+      <select
+        id="rep"
+        className="border rounded px-2 py-1 text-sm"
+        value={selectedRep}
+        onChange={(e) => setSelectedRep(e.target.value)}
+        disabled={isPending}
+      >
+        {MOCK_REPS.map((rep) => (
+          <option key={rep.id} value={rep.id}>
+            {rep.name}
+          </option>
+        ))}
+      </select>
 
       <button
         type="submit"
         disabled={isPending}
-        className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[12px] rounded-lg px-3 py-2 border border-orange-500/40 w-full text-center"
+        className="inline-flex items-center justify-center px-3 py-1.5 rounded bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
       >
-        {isPending ? "Saving..." : "Update Owner"}
+        {isPending ? "Saving..." : "Save assignment"}
       </button>
 
-      <p className="text-[10px] text-neutral-500 leading-snug">
-        🔥 means that rep is already working recent inbound leads.
+      {msg && <p className="text-xs text-gray-700">{msg}</p>}
+
+      <p className="text-[10px] text-gray-400 mt-1">
+        (later this will call the real <code>assignRepToBusiness</code> server action)
       </p>
     </form>
   );

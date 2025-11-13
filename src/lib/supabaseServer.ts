@@ -1,40 +1,40 @@
-// /src/lib/supabaseServer.ts
-import { cookies } from "next/headers";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+// C:\Users\Owner\ld247\src\lib\supabaseServer.ts
 
-/**
- * Server-side Supabase client for Server Components & Server Actions.
- * Uses anon key (safe on server) and persists auth via Next's cookies.
- */
-export function getSupabaseServer() {
+// SSR/server-only Supabase client wired to Next.js cookies.
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+/** Factory (named export) — this is what admin pages should import. */
+export function createClient() {
   const cookieStore = cookies();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({
-            name,
-            value,
-            ...options,
-          } as any);
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({
-            name,
-            value: "",
-            ...options,
-            expires: new Date(0),
-          } as any);
-        },
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
       },
-    }
-  );
+      set(name: string, value: string, options: any) {
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // ignore cookie write errors on server
+        }
+      },
+      remove(name: string, options: any) {
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch {
+          // ignore cookie remove errors on server
+        }
+      },
+    },
+  });
 }
 
-export default getSupabaseServer;
+/** Optional aliases (exported too) */
+export const supabase = createClient();         // if something imports { supabase } from "@/lib/supabaseServer"
+export const supabaseServer = () => createClient();
+export default createClient;

@@ -1,46 +1,39 @@
+// src/app/sales/apply/actions.ts
 "use server";
 
-import { redirect } from "next/navigation";
-import { createSupabaseServer } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+import { createSupabaseServer } from "@/utils/supabase/server"; // compat alias OK
 
 export async function submitRepApplication(formData: FormData) {
-  const full_name = formData.get("full_name")?.toString().trim() ?? "";
-  const territory = formData.get("territory")?.toString().trim() ?? "";
-  const phone = formData.get("phone")?.toString().trim() ?? "";
-  const email = formData.get("email")?.toString().trim() ?? "";
-  const experience_level =
-    formData.get("experience_level")?.toString().trim() ?? "";
-  const comfort_in_person =
-    formData.get("comfort_in_person")?.toString().trim() ?? "";
-  const start_timing = formData.get("start_timing")?.toString().trim() ?? "";
+  // 1) Read & validate
+  const full_name = String(formData.get("full_name") ?? "").trim();
+  const territory = String(formData.get("territory") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
 
-  // Basic guard. You can tighten this later.
-  if (!full_name || !phone) {
-    // In the future you can return an error state instead of redirect.
-    // For first pass we just bounce back to form.
-    redirect("/sales/apply?error=missing_required_fields");
+  if (!full_name || !territory) {
+    return { ok: false, error: "Full name and territory are required." };
   }
 
-  const supabase = createSupabaseServer();
+  // 2) Create SSR client (IMPORTANT: await)
+  const supabase = await createSupabaseServer();
 
+  // 3) Insert
   const { error } = await supabase.from("rep_applicants").insert([
     {
       full_name,
       territory,
-      phone,
-      email,
-      experience_level,
-      comfort_in_person,
-      start_timing,
-      status: "new",
+      email: email || null,
+      phone: phone || null,
     },
   ]);
 
   if (error) {
-    console.error("rep_applicants insert error:", error.message);
-    redirect("/sales/apply?error=save_failed");
+    return { ok: false, error: error.message };
   }
 
-  // Later we do a /sales/apply/success page. For now keep it simple.
-  redirect("/sales/apply?submitted=1");
+  // 4) Revalidate any page that lists applicants (adjust path if needed)
+  revalidatePath("/sales/apply");
+
+  return { ok: true };
 }

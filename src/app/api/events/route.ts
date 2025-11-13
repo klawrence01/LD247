@@ -1,16 +1,19 @@
+// /src/app/api/events/route.ts
 import { NextResponse } from "next/server";
-import { createSupabaseServer } from "@/utils/supabase/server";
+import {
+  createSupabaseServerClient,
+  createSupabaseServer,
+} from "@/utils/supabase/server";
 
 export async function POST(req: Request) {
   try {
-    const supabase = createSupabaseServer(); // anon OK for insert per policy
-    const body = await req.json();
-    const { business_id, type, meta } = body || {};
+    // 1) real client (MUST await now)
+    const supabase = await createSupabaseServerClient(); // or: await createSupabaseServer();
 
-    if (!business_id || !type) {
-      return NextResponse.json({ error: "business_id and type are required" }, { status: 400 });
-    }
+    // 2) read body
+    const { business_id, type, meta } = await req.json();
 
+    // 3) insert event
     const { error } = await supabase.from("events").insert({
       business_id,
       type,
@@ -18,10 +21,19 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      console.error("events insert failed", error);
+      return NextResponse.json(
+        { ok: false, error: error.message },
+        { status: 500 }
+      );
     }
-    return NextResponse.json({ ok: true }, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "unknown error" }, { status: 500 });
+
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    console.error("events route error", err);
+    return NextResponse.json(
+      { ok: false, error: err?.message ?? "Unknown error" },
+      { status: 500 }
+    );
   }
 }

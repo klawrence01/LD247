@@ -1,26 +1,36 @@
-// src/app/VendorDashboard/[id]/page.tsx
-import React from "react";
+import { createClient } from '@/lib/supabaseServer';
 
-type PageProps = {
-  params: {
-    id: string;
-  };
-};
+export default async function VendorDashboardPage({
+  params,
+  // include searchParams in the signature to satisfy Next’s generic constraint
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  const supabase = createClient();
+  const vendorId = params.id;
 
-export default async function VendorDashboardByIdPage({ params }: PageProps) {
-  const { id } = params;
+  // Example safe query (replace with your real fields)
+  const { data, error } = await supabase
+    .from('vendors')
+    .select('id,name')
+    .eq('id', vendorId)
+    .single();
+
+  if (error) {
+    console.error('Vendor load error:', error);
+    return <div className="p-6 text-red-600">Failed to load vendor data.</div>;
+  }
+
+  if (!data) {
+    return <div className="p-6">No vendor found for ID: {vendorId}</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white px-6 py-10">
-      <h1 className="text-2xl font-bold mb-4">Vendor Dashboard</h1>
-      <p className="text-slate-300 text-sm mb-6">
-        Viewing vendor with id: <span className="font-mono">{id}</span>
-      </p>
-      <div className="rounded-xl border border-slate-200/10 bg-slate-900/40 p-4">
-        <p className="text-slate-200 text-sm">
-          Replace this with the real vendor detail component.
-        </p>
-      </div>
+    <div className="p-6 space-y-2">
+      <h1 className="text-2xl font-semibold">{data.name}</h1>
+      <p className="text-gray-600">Vendor ID: {data.id}</p>
     </div>
   );
 }

@@ -1,12 +1,13 @@
 // src/utils/supabase/server.ts
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Server-side Supabase client for App Router pages and server actions.
- * Works with the latest @supabase/ssr which requires get/set/remove cookie methods.
+ * Returns a *synchronous* Supabase server client.
+ * No Promise => you can immediately call .from(), .auth.getUser(), etc.
  */
-export function createSupabaseServer() {
+export function createSupabaseServerClient(): SupabaseClient {
   const cookieStore = cookies();
 
   return createServerClient(
@@ -21,9 +22,13 @@ export function createSupabaseServer() {
           cookieStore.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+          cookieStore.set({ name, value: "", ...options });
         },
       },
     }
   );
 }
+
+// convenient aliases for older imports you might still have around
+export const createSupabaseServer = createSupabaseServerClient;
+export default createSupabaseServerClient;

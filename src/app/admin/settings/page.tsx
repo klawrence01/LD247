@@ -1,8 +1,15 @@
-export default function SettingsPage() {
+"use client";
+
+export default function AdminSettingsPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Settings</h1>
-      <p>This panel will allow admins to update platform configurations. Coming soon!</p>
-    </div>
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-3">
+        Admin – Settings
+      </h1>
+      <p className="text-sm text-gray-500">
+        Placeholder settings page. We removed the old markdown loader that was
+        importing <code>@/lib/getPostContent</code>.
+      </p>
+    </main>
   );
 }

@@ -1,31 +1,58 @@
+// Server Component
 import Link from "next/link";
-import { createSupabaseServer } from "@/utils/supabase/server";
+import { createSupabaseServerClient } from "@/utils/supabase/server";
 
-export const metadata = { title: "Sent Notes" };
+export const metadata = {
+  title: "Messaging • Sent",
+};
 
-export default async function SentPage() {
-  const supabase = createSupabaseServer();
-  const { data: rows } = await supabase
+export default async function SentMessagesPage() {
+  const supabase = await createSupabaseServerClient();
+
+  const { data: rows, error } = await supabase
     .from("messages")
     .select("id, subject, created_at")
-    .eq("status","sent")
-    .order("created_at",{ascending:false});
+    .eq("status", "sent")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-semibold">Sent Messages</h1>
+        <p className="mt-4 text-red-600">Error: {error.message}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Sent Notes</h1>
-        <Link href="/dashboard/merchant/messaging" className="text-sm underline">Back</Link>
-      </div>
-      <div className="mt-6 space-y-2">
-        {(rows ?? []).map(m => (
-          <div key={m.id} className="rounded-lg border px-4 py-3">
-            <div className="font-medium">{m.subject}</div>
-            <div className="text-xs text-gray-500">{new Date(m.created_at).toLocaleString()}</div>
-          </div>
-        ))}
-        {(rows ?? []).length === 0 && <div className="text-gray-500 text-sm">You haven’t sent any notes yet.</div>}
-      </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold">Sent Messages</h1>
+
+      {(!rows || rows.length === 0) ? (
+        <p className="mt-4 text-sm text-gray-500">No messages sent yet.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {rows.map((m) => (
+            <li key={m.id} className="rounded-lg border p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{m.subject ?? "(no subject)"}</div>
+                  <div className="text-xs text-gray-500">
+                    {new Date(m.created_at as string).toLocaleString()}
+                  </div>
+                </div>
+                {/* If you have a detail route, update this href accordingly */}
+                <Link
+                  className="text-sm underline"
+                  href={`/dashboard/merchant/messaging/${m.id}`}
+                >
+                  View
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

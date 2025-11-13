@@ -1,8 +1,11 @@
-export default function HeroBanner() {
+// src/components/city/HeroBanner.tsx
+export default function HeroBanner({ city }: { city: string }) {
   return (
-    <section className="bg-gray-100 text-center p-6 rounded-lg shadow">
-      <h1 className="text-3xl font-bold">Welcome to Your City Deals!</h1>
-      <p className="text-gray-600 mt-2">Discover today’s local treasures and top offers.</p>
-    </section>
+    <div className="rounded-xl bg-gradient-to-r from-orange-500 to-orange-700 p-6 text-white mb-6">
+      <h1 className="text-2xl font-bold">Local Deals in {city}</h1>
+      <p className="text-sm opacity-90">
+        Save today, support local, come back tomorrow.
+      </p>
+    </div>
   );
 }

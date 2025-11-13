@@ -1,6 +1,20 @@
-import { createClient } from "@supabase/supabase-js";
+// C:\Users\Owner\ld247\src\lib\supabase.ts
 
-export const supabase = createClient(
-  "https://wxmpoxzdnlhizpbvmsyf.supabase.co", // <-- Your actual Supabase project URL
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4bXBveHpkbmxoaXpwYnZtc3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM0NjYwMzEsImV4cCI6MjAzOTA0MjAzMX0.A5-fEnyF4CfBN01n7rBOW_lyyf0pn8sHWtBPiIcVKJ0" // <-- Your actual anon key
-);
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// Factory for pages that do: import { createClient } from "@/lib/supabase"
+export function createClient() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error("Missing Supabase environment variables");
+  }
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+// For pages that do: import { supabase } from "@/lib/supabase"
+export const supabase = createClient();
+
+// Optional default export (if any old code uses it)
+export default supabase;

@@ -1,20 +1,16 @@
-// ✅ Vercel-compliant Supabase client (browser-only)
-"use client";
+'use client';
 
-import { createBrowserClient } from "@supabase/ssr";
+// Browser/client-only Supabase singleton
+import { createBrowserClient } from '@supabase/ssr';
 
-let supabase: ReturnType<typeof createBrowserClient> | null = null;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-/**
- * Returns a singleton browser Supabase client.
- * Works in dev, preview, and prod on Vercel.
- */
-export function getSupabaseBrowser() {
-  if (!supabase) {
-    supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  }
+export const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/** Optional factory (kept for compatibility) */
+export function createClient() {
   return supabase;
 }
+
+export default supabase;

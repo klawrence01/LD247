@@ -1,16 +1,19 @@
 "use server";
 
-import { createSupabaseServer } from "@/utils/supabase/server";
+import {
+  createSupabaseServerClient,
+  createSupabaseServer,
+} from "@/utils/supabase/server";
 
-// Assign an inbound (unclaimed) lead to a rep
-export async function claimInboundLead(opts: {
+// canonical version: accept ONE object
+export async function assignInboundLead(args: {
   leadId: string;
   repId: string;
 }) {
-  const { leadId, repId } = opts;
-  const supabase = createSupabaseServer();
+  const { leadId, repId } = args;
 
-  // Update the lead to attach sales_rep_id and move the stage forward
+  const supabase = await createSupabaseServerClient(); // or await createSupabaseServer();
+
   const { error } = await supabase
     .from("rep_leads")
     .update({
@@ -20,13 +23,12 @@ export async function claimInboundLead(opts: {
     .eq("id", leadId);
 
   if (error) {
-    return {
-      ok: false,
-      message: error.message,
-    };
+    console.error("inbound assign failed", error);
+    throw new Error("Could not assign lead");
   }
 
-  return {
-    ok: true,
-  };
+  return { success: true };
 }
+
+// keep the old name the form imports
+export { assignInboundLead as claimInboundLead };

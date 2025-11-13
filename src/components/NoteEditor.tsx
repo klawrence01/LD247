@@ -1,40 +1,38 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
-import "react-quill/dist/quill.snow.css";
 
-type Props = {
+const QuillEditor = dynamic(() => import("./QuillBase"), {
+  ssr: false,
+}) as any;
+
+type NoteEditorProps = {
   value: string;
-  onChange: (html: string) => void;
+  onChange: (val: string) => void;
   placeholder?: string;
 };
 
-export default function NoteEditor({ value, onChange, placeholder }: Props) {
-  const ReactQuill = useMemo(() => dynamic(() => import("react-quill"), { ssr: false }), []);
+export default function NoteEditor({
+  value,
+  onChange,
+  placeholder,
+}: NoteEditorProps) {
   const modules = {
     toolbar: [
       ["bold", "italic", "underline"],
       [{ list: "ordered" }, { list: "bullet" }],
-      [{ align: [] }],
       ["link"],
       ["clean"],
     ],
-    clipboard: { matchVisual: false },
   };
-  const formats = ["bold", "italic", "underline", "list", "bullet", "align", "link"];
+
   return (
-    <div className="rounded-md border">
-      {/* @ts-ignore */}
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder={placeholder || "Write your note..."}
-        style={{ minHeight: 220 }}
-      />
-    </div>
+    <QuillEditor
+      theme="snow"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      modules={modules}
+    />
   );
 }

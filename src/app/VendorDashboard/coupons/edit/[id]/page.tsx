@@ -1,27 +1,23 @@
-'use client';
+// src/app/VendorDashboard/coupons/edit/[id]/page.tsx
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { Deal, getDeal } from '../../../_lib/deals';
-import DealForm from '../../_components/DealForm';
+import DealForm from "../../DealForm";
 
-export default function EditDealPage() {
-  const params = useParams<{ id: string }>();
-  const [deal, setDeal] = useState<Deal | null>(null);
-
-  useEffect(() => {
-    const d = getDeal(params.id);
-    setDeal(d || null);
-  }, [params.id]);
-
-  if (!deal) {
-    return <div className="p-6">Deal not found.</div>;
-  }
+export default async function EditCouponPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-xl font-semibold">Edit Deal</h1>
-      <DealForm initial={deal} />
+    <div className="p-6 space-y-4">
+      <h1 className="text-xl font-semibold">Edit Deal</h1>
+      <p className="text-sm text-muted-foreground">
+        Editing deal: <code>{id}</code>
+      </p>
+
+      {/* keep the form visible, don't pass unknown props */}
+      <DealForm />
     </div>
   );
 }

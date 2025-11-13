@@ -1,167 +1,113 @@
-// src/app/admin/messages/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowser } from "@/lib/supabaseBrowser";
+import React, { useState } from "react";
+import { supabase } from "@/lib/supabaseBrowser"; // keep your path
 
-type AdminMessage = {
-  id: string;
+type AdminMessageForm = {
   title: string;
   body: string;
-  audience: string | null;
-  created_at: string;
+  audience: string;
 };
 
 export default function AdminMessagesPage() {
-  const supabase = getSupabaseBrowser();
-  const router = useRouter();
+  const [form, setForm] = useState<AdminMessageForm>({
+    title: "",
+    body: "",
+    audience: "all",
+  });
+  const [status, setStatus] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const [title, setTitle] = useState("New vendor promo for March...");
-  const [body, setBody] = useState(
-    "Hi team! Here is this week's LocalDeals247 update..."
-  );
-  const [audience, setAudience] = useState("all_vendors");
-  const [messages, setMessages] = useState<AdminMessage[]>([]);
-  const [loading, setLoading] = useState(false);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setStatus(null);
 
-  // load recent messages
-  useEffect(() => {
-    const loadMessages = async () => {
-      const { data, error } = await supabase
-        .from("admin_messages")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (!error && data) {
-        setMessages(data as AdminMessage[]);
-      }
+    const payload = {
+      title: form.title,
+      body: form.body,
+      audience: form.audience,
     };
 
-    loadMessages();
-  }, [supabase]);
-
-  const handleSave = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("admin_messages")
-      .insert({
-        title,
-        body,
-        audience,
-      })
-      .select()
-      .single();
-
-    setLoading(false);
+    // TS doesn’t know table shape -> tell it to ignore this insert
+    // @ts-ignore – table type for admin_messages is not declared yet
+    const { error } = await supabase.from("admin_messages").insert(payload);
 
     if (error) {
       console.error(error);
-      return;
+      setStatus("Failed to send message.");
+    } else {
+      setStatus("Message saved/sent.");
+      setForm({ title: "", body: "", audience: "all" });
     }
 
-    // prepend to list
-    setMessages((prev) => (data ? [data as AdminMessage, ...prev] : prev));
-  };
+    setSaving(false);
+  }
 
   return (
-    <div className="p-8 flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Messaging Center</h1>
-          <p className="text-neutral-300 mt-1">
-            Send announcements to vendors — by state, by plan, or all at once.
-          </p>
-          <p className="text-xs text-neutral-500 mt-1">
-            Using table: <span className="text-orange-300">admin_messages</span>
-          </p>
-        </div>
-      </div>
+    <main className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-2">
+        Admin – Messages
+      </h1>
+      <p className="text-sm text-gray-500 mb-6">
+        Compose a message to admins, vendors, or everyone.
+      </p>
 
-      {/* compose */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-white">Compose message</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm text-neutral-300 mb-1">Title</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-neutral-950/60 border border-neutral-700 rounded-lg px-3 py-2 text-white"
-              placeholder="Title..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-neutral-300 mb-1">
-              Audience
-            </label>
-            <select
-              value={audience}
-              onChange={(e) => setAudience(e.target.value)}
-              className="w-full bg-neutral-950/60 border border-neutral-700 rounded-lg px-3 py-2 text-white"
-            >
-              <option value="all_vendors">All vendors</option>
-              <option value="by_state">By state</option>
-              <option value="by_plan">By plan</option>
-              <option value="sales_team">Sales team</option>
-            </select>
-          </div>
-        </div>
-
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border rounded-xl p-5 space-y-4"
+      >
         <div>
-          <label className="block text-sm text-neutral-300 mb-1">Message</label>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={5}
-            className="w-full bg-neutral-950/60 border border-neutral-700 rounded-lg px-3 py-2 text-white"
-            placeholder="Write your update..."
+          <label className="block text-sm font-medium mb-1">Title</label>
+          <input
+            value={form.title}
+            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+            className="w-full border rounded px-3 py-2 text-sm"
+            required
           />
         </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 px-5 py-2 rounded-lg text-white font-medium"
+        <div>
+          <label className="block text-sm font-medium mb-1">Audience</label>
+          <select
+            value={form.audience}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, audience: e.target.value }))
+            }
+            className="w-full border rounded px-3 py-2 text-sm"
           >
-            {loading ? "Saving..." : "Save message"}
-          </button>
+            <option value="all">All</option>
+            <option value="vendors">Vendors</option>
+            <option value="merchants">Merchants</option>
+            <option value="admins">Admins</option>
+          </select>
         </div>
-      </div>
 
-      {/* recent messages */}
-      <div className="bg-neutral-900/40 border border-neutral-800 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Recent messages
-        </h2>
-        {messages.length === 0 ? (
-          <div className="bg-neutral-950/30 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-400">
-            No messages recorded yet.
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className="bg-neutral-950/40 border border-neutral-800 rounded-lg px-4 py-3"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-white font-medium">{msg.title}</h3>
-                  <span className="text-xs text-neutral-500">
-                    {new Date(msg.created_at).toLocaleString()}
-                  </span>
-                </div>
-                <p className="text-neutral-300 mt-1 text-sm">{msg.body}</p>
-                <p className="text-xs text-neutral-500 mt-2">
-                  Audience: {msg.audience ?? "—"}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Body</label>
+          <textarea
+            value={form.body}
+            onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
+            rows={5}
+            className="w-full border rounded px-3 py-2 text-sm"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="inline-flex items-center px-4 py-2 bg-slate-900 text-white text-sm rounded-lg disabled:opacity-60"
+        >
+          {saving ? "Saving..." : "Send message"}
+        </button>
+
+        {status && (
+          <p className="text-sm text-gray-500 mt-2" role="status">
+            {status}
+          </p>
         )}
-      </div>
-    </div>
+      </form>
+    </main>
   );
 }

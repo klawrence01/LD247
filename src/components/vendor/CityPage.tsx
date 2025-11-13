@@ -1,25 +1,33 @@
-// src/components/CityPage.tsx
+// src/components/vendor/CityPage.tsx
 
-import HeroBanner from './city/[city]/HeroBanner';
-import FeaturedMerchants from './city/[city]/FeaturedMerchants';
-import DealList from './city/[city]/DealList';
-import CategoryFilter from './city/[city]/CategoryFilter';
-import FollowCity from './city/[city]/FollowCity';
-import CityStats from './city/[city]/CityStats';
-import TestimonialSlider from './city/[city]/TestimonialSlider';
-import MapWidget from './city/[city]/MapWidget';
+import HeroBanner from "@/components/city/HeroBanner";
+import FeaturedMerchants from "@/components/city/FeaturedMerchants";
+import DealList from "@/components/city/DealList";
+import CategoryFilter from "@/components/city/CategoryFilter";
+import { useState } from "react";
 
-export default function CityPage() {
+type CityPageProps = {
+  city: string;
+  deals?: Array<{ id: string; title: string; description?: string }>;
+  merchants?: Array<{ id: string; name: string; tagline?: string }>;
+};
+
+export default function CityPage({
+  city,
+  deals = [],
+  merchants = [],
+}: CityPageProps) {
+  const [category, setCategory] = useState("All");
+
+  // later you can actually filter based on category
+  const visibleDeals = deals;
+
   return (
-    <div className="flex flex-col gap-8 p-4 sm:p-8">
-      <HeroBanner />
-      <FollowCity />
-      <CategoryFilter />
-      <DealList />
-      <FeaturedMerchants />
-      <TestimonialSlider />
-      <CityStats />
-      <MapWidget />
+    <div className="space-y-4">
+      <HeroBanner city={city} />
+      <FeaturedMerchants merchants={merchants} />
+      <CategoryFilter value={category} onChange={setCategory} />
+      <DealList deals={visibleDeals} />
     </div>
   );
 }

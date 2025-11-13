@@ -1,27 +1,14 @@
-import { getPostContent } from '@/lib/getPostContent'
-import { notFound } from 'next/navigation'
+"use client";
 
-interface Props {
-  params: { slug: string }
-}
-
-export default function BlogPostPage({ params }: Props) {
-  const post = getPostContent(params.slug, 'behind-the-hustle')
-
-  if (!post) {
-    notFound()
-  }
-
+export default function AdminSettingsPage() {
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        {post.date} • {post.author}
+    <main className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-3">
+        Admin – Settings
+      </h1>
+      <p className="text-sm text-gray-500">
+        Placeholder settings page. (We removed the import for "@/lib/getPostContent".)
       </p>
-      <div
-        className="prose prose-lg"
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
-    </div>
-  )
+    </main>
+  );
 }
