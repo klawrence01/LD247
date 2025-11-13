@@ -1,37 +1,34 @@
-// C:\Users\Owner\ld247\src\app\VendorDashboard\[id]\page.tsx
+// C:\Users\klawr\LD247\src\app\VendorDashboard\[id]\page.tsx
 
-type VendorDashboardPageProps = {
+export const dynamic = "force-dynamic";
+
+type PageProps = {
   params: {
     id: string;
   };
 };
 
-export default async function VendorDashboardPage({
-  params,
-}: VendorDashboardPageProps) {
+export default async function VendorDashboardPage({ params }: PageProps) {
   const { id } = params;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl">
-        <h1 className="text-2xl font-semibold mb-2">Vendor Dashboard</h1>
+    <div className="min-h-screen bg-slate-950 text-slate-50 px-6 py-8">
+      <div className="mx-auto max-w-4xl space-y-4">
+        <header>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Vendor Dashboard (Placeholder)
+          </h1>
+          <p className="mt-1 text-sm text-slate-400">
+            This page is wired only for routing right now. ID from the URL:
+            <span className="ml-1 font-mono text-xs bg-slate-900 px-2 py-1 rounded">
+              {id}
+            </span>
+          </p>
+        </header>
 
-        <p className="text-sm text-slate-400 mb-4">
-          This is the vendor dashboard page wired to the dynamic vendor ID from
-          the URL.
-        </p>
-
-        <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
-            Vendor ID
-          </div>
-          <div className="font-mono text-lg break-all">{id}</div>
-        </div>
-
-        <p className="mt-6 text-sm text-slate-400">
-          You can later plug in Supabase queries here to load this vendor&apos;s
-          deals, stats, and messages. For now this is a safe placeholder that
-          compiles cleanly so we can get your site deployed.
+        <p className="text-sm text-slate-400">
+          Once deployment is stable, we&apos;ll hook this up to real vendor
+          stats and tools.
         </p>
       </div>
     </div>
