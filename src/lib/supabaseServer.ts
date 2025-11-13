@@ -1,14 +1,22 @@
-// C:\Users\Owner\ld247\src\lib\supabaseServer.ts
-// Server-side Supabase client for Next.js (uses cookies)
-
+// C:\Users\Klawr\LD247\src\lib\supabaseServer.ts
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export function createClient(): SupabaseClient {
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  );
+}
+
+/**
+ * This is what your admin / server components expect:
+ *
+ *   import { createClient } from "@/lib/supabaseServer";
+ */
+export function createClient() {
   const cookieStore = cookies();
 
   return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -17,17 +25,23 @@ export function createClient(): SupabaseClient {
         return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: CookieOptions) {
-        cookieStore.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // ignore – cookie writes can fail in edge cases
+        }
       },
       remove(name: string, options: CookieOptions) {
-        cookieStore.set({ name, value: "", ...options });
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch {
+          // ignore
+        }
       },
     },
   });
 }
 
-// Many pages just import { supabase }
-export const supabase = createClient();
-
-// Default export, in case something does: import supabaseServer from ...
-export default supabase;
+// Optional aliases
+export const supabaseServer = () => createClient();
+export default createClient;

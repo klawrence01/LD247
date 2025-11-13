@@ -1,4 +1,10 @@
-// C:\Users\Owner\ld247\src\lib\supabase.ts
-// Default entry: use the SERVER client by default for app-router pages
+// C:\Users\Klawr\LD247\src\lib\supabase.ts
 
-export { createClient, supabase, default } from "./supabaseServer";
+// Re-export the browser client so imports like
+//   import { supabase } from "@/lib/supabase";
+// keep working.
+export { supabase } from "./supabaseBrowser";
+
+// If you ever need the raw browser createClient, you can also do:
+//   import { createClient as createSupabaseClient } from "@/lib/supabase";
+export { createClient as createSupabaseClient } from "./supabaseBrowser";
